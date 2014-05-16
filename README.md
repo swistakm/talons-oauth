@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/swistakm/talons-oauth.svg?branch=master)](https://travis-ci.org/swistakm/talons-oauth)
+
 talons-oauth
 ============
 
