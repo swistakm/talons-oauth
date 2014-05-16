@@ -10,8 +10,8 @@ import testtools
 
 from talons.auth import oauth
 
-import validator
-from validator import ExampleRequestValidator
+from . import validator
+from .validator import ExampleRequestValidator
 
 LOG_FORMAT = "[%(levelname)-7s] %(msg)s"
 
