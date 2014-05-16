@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 from setuptools import setup, find_packages
-import sys
 import os
-
-sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'src'))
 
 PACKAGES = find_packages(exclude='tests')
 README = open(os.path.join(os.path.dirname(__file__), 'README.md')).read()
