@@ -1,28 +1,30 @@
 # -*- coding: utf-8 -*-
 """ Testing RequestValidator for oauthlib
 """
+from oauthlib.common import UNICODE_ASCII_CHARACTER_SET
 from oauthlib.oauth1 import RequestValidator
 
-CLIENT_KEYS = ['test_client_key']
+CLIENT_KEYS = [u'test_client_key']
 
 CLIENT_SECRETS = {
-    CLIENT_KEYS[0]: "test_secret"
+    CLIENT_KEYS[0]: u"test_secret"
 }
 
 CLIENT_RSAS = {
-    CLIENT_KEYS[0]: 'test RSA key'
+    CLIENT_KEYS[0]: u'test RSA key'
 }
 
 REQUEST_TOKENS = {
     CLIENT_KEYS[0]: {
-        'token': 'test request token',
-        'secret': 'test token secret'
+        'token': u'test request token',
+        'secret': u'test token secret'
     }
 }
 
 ACCESS_TOKENS = {
     CLIENT_KEYS[0]: {
-        'token': 'test_access_token',
+        'token': u'test_access_token',
+        'secret': u'test_secret',
     }
 }
 NONCES = []
@@ -35,6 +37,15 @@ class ExampleRequestValidator(RequestValidator):
     dummy_client = 'dummy'
     dummy_request_token = 'dummy'
     dummy_access_token = 'dummy'
+
+    default_lengths = (1, 100)
+
+    client_key_length = default_lengths
+    request_token_length = default_lengths
+    access_token_length = default_lengths
+    nonce_length = default_lengths
+    verifier_length = default_lengths
+    safe_characters = set(UNICODE_ASCII_CHARACTER_SET + '_')
 
     def validate_client_key(self, client_key, request):
         """ Needed by: AccessTokenEndpoint, RequestTokenEndpoint,
