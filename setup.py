@@ -4,7 +4,6 @@ import sys
 import os
 
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'src'))
-from talons.auth.oauth import __version__ as version
 
 PACKAGES = find_packages(exclude='tests')
 README = open(os.path.join(os.path.dirname(__file__), 'README.md')).read()
@@ -19,10 +18,21 @@ def reqs(*f):
         os.path.join(os.getcwd(), *f)).readlines()]))
 
 
-install_requires = reqs('requirements.txt')
+def get_version(version_tuple):
+    if not isinstance(version_tuple[-1], int):
+        return '.'.join(map(str, version_tuple[:-1])) + version_tuple[-1]
+    return '.'.join(map(str, version_tuple))
+
+
+init = os.path.join(os.path.dirname(__file__), 'talons', 'auth', 'oauth', '__init__.py')
+version_line = list(filter(lambda l: l.startswith('VERSION'), open(init)))[0]
+
+VERSION = get_version(eval(version_line.split('=')[-1]))
+INSTALL_REQUIRES = reqs('requirements.txt')
+
 setup(
     name='talons.auth.oauth',
-    version=version,
+    version=VERSION,
     author='Michał Jaworski',
     author_email='swistakm@gmail.com',
     description='OAuth 1.0 extension for Talons WSGI middleware library',
@@ -31,7 +41,7 @@ setup(
     packages=PACKAGES,
 
     include_package_data=True,
-    install_requires=install_requires,
+    install_requires=INSTALL_REQUIRES,
     zip_safe=True,
 
     classifiers=[
