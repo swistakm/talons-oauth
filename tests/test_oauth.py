@@ -53,7 +53,9 @@ class TestOAuth(testtools.TestCase):
         type(req).stream = stream = mock.PropertyMock(return_value=None)
         type(req).method = method = mock.PropertyMock(return_value="GET")
         type(req).headers = headers = mock.PropertyMock(return_value=dict())
+        type(req).query_string = query = mock.PropertyMock(return_value="")
         type(req).url = url = mock.PropertyMock(return_value='resource_url/')
+
         type(req).env = env = mock.PropertyMock(return_value=dict())
 
         mod_cls = 'talons.auth.oauth.OAuthIdentity'
@@ -61,12 +63,12 @@ class TestOAuth(testtools.TestCase):
             i = oauth.Identifier()
             i.identify(req)
 
+            # this three must me used to check if it could be OAuth
             stream.assert_called_once_with()
-            method.assert_called_once_with()
             headers.assert_called_once_with()
-            url.assert_called_once_with()
+            query.assert_called_once_with()
 
-            assert env.assert_called_once_with()
+            assert env.called
             assert not i_mock.called
 
     def test_identity_valid(self):
@@ -79,21 +81,22 @@ class TestOAuth(testtools.TestCase):
         type(req).stream = stream = mock.PropertyMock(return_value=None)
         type(req).method = method = mock.PropertyMock(return_value=method)
         type(req).headers = headers = mock.PropertyMock(return_value=headers)
+        type(req).query_string = query = mock.PropertyMock(return_value="")
         type(req).url = url = mock.PropertyMock(return_value=url)
-        
-        type(req).env = env = mock.PropertyMock(return_value=dict())
+
+        # clean env to ensure that won't stop checking for identity
+        type(req).env = mock.PropertyMock(return_value=dict())
 
         mod_cls = 'talons.auth.oauth.OAuthIdentity'
         with mock.patch(mod_cls, spec=oauth.OAuthIdentity) as i_mock:
             i = oauth.Identifier()
             i.identify(req)
 
-            stream.assert_called_once_with()
-            method.assert_called_once_with()
-            headers.assert_called_once_with()
-            url.assert_called_once_with()
-
-            assert env.called
+            assert stream.called
+            assert method.called
+            assert headers.called
+            assert url.called
+            assert req.env[oauth.Identifier.IDENTITY_ENV_KEY]
 
     def test_authenticator_invalid(self):
         stream = "example body"
