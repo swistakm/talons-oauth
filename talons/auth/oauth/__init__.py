@@ -72,6 +72,7 @@ class Authenticator(interfaces.Authenticates):
             raise exc.BadConfiguration(msg)
 
         self.provider = ResourceEndpoint(oauth_validator)
+        self.realms = conf.pop('realms', [])
 
     def authenticate(self, identity):
         """ Authenticate user client using oauthlib's ResourceEndopoint
@@ -82,6 +83,7 @@ class Authenticator(interfaces.Authenticates):
             getattr(identity, 'url', None),
             http_method=getattr(identity, 'method', None),
             body=getattr(identity, 'stream', None),
-            headers=getattr(identity, 'headers', None)
+            headers=getattr(identity, 'headers', None),
+            realms=self.realms,
         )
         return bool(v)
