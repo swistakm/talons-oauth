@@ -4,28 +4,53 @@
 from oauthlib.common import UNICODE_ASCII_CHARACTER_SET
 from oauthlib.oauth1 import RequestValidator
 
-CLIENT_KEYS = [u'test_client_key']
+CLIENT_KEYS = [u'test_client_key',
+               u'test_restricted_client_invalid_realms',
+               u'test_restricted_client_no_realms']
 
 CLIENT_SECRETS = {
-    CLIENT_KEYS[0]: u"test_secret"
+    CLIENT_KEYS[0]: u"test_secret",
+    CLIENT_KEYS[1]: u"test_secret",
+    CLIENT_KEYS[2]: u"test_secret",
 }
 
 CLIENT_RSAS = {
-    CLIENT_KEYS[0]: u'test RSA key'
+    CLIENT_KEYS[0]: u'test RSA key',
+    CLIENT_KEYS[1]: u'test RSA key',
+    CLIENT_KEYS[2]: u"test RSA key",
 }
 
 REQUEST_TOKENS = {
     CLIENT_KEYS[0]: {
-        'token': u'test request token',
-        'secret': u'test token secret'
-    }
+        'token': u'test request token0',
+        'secret': u'test token secret',
+        'realms': [u'photos', u'printers'],
+        'redirect_uri': u'oob'
+    },
+    CLIENT_KEYS[1]: {
+        'token': u'test request token1',
+        'secret': u'test token secret',
+        'realms': [u'foo', u'bar'],
+        'redirect_uri': u'oob'
+    },
 }
 
 ACCESS_TOKENS = {
     CLIENT_KEYS[0]: {
-        'token': u'test_access_token',
+        'token': u'test_access_token0',
         'secret': u'test_secret',
-    }
+        'realms': [u'photos', u'printers'],
+    },
+    CLIENT_KEYS[1]: {
+        'token': u'test access token1',
+        'secret': u'test token secret',
+        'realms': [u'foo', u'bar'],
+    },
+    CLIENT_KEYS[2]: {
+        'token': u'test access token2',
+        'secret': u'test token secret',
+        'realms': [],
+    },
 }
 NONCES = []
 VERIFIERS = {
@@ -94,7 +119,7 @@ class ExampleRequestValidator(RequestValidator):
                         realms=None):
         """ Needed by: ResourceEndpoint
         """
-        return True
+        return set(self.get_realms(token, request)).issuperset(set(realms))
 
     def validate_verifier(self, client_key, token, verifier, request):
         """ Needed by: AccessTokenEndpoint
@@ -146,3 +171,44 @@ class ExampleRequestValidator(RequestValidator):
             'token': token['oauth_token'],
             'secret': token['oauth_secret'],
         }
+
+    def get_realms(self, token, request):
+        """ Get allowed realms for given access token
+        Needed by: AuthorizationEndpoint, AccessTokenEndpoint
+        """
+        access_tokens = [token_dict for token_dict in ACCESS_TOKENS.values()
+                         if token_dict['token'] == token]
+        try:
+            realms = access_tokens.pop()['realms']
+        except IndexError:
+            realms = []
+        return realms
+
+    def get_redirect_uri(self, token, request):
+        """ Needed by: RequestTokenUri
+        """
+        return token['redirect_uri']
+
+    def invalidate_request_token(self, client_key, request_token, request):
+        """ Needed by: AccessTokenEndpoint
+        """
+        # do not care
+        pass
+
+    def verify_realms(self, token, realms, request):
+        """ Needed by: AuthorizationEndpoint
+        """
+        valid_realms = self.get_realms(token)
+        return set(valid_realms) == set(realms)
+
+    def verify_request_token(self, token, request):
+        """ Needed by: AuthorizationEndpoint
+        """
+        all_tokens = [token['token'] for token in REQUEST_TOKENS.values()]
+        return token in all_tokens
+
+    def get_default_realms(self, client_key, request):
+        """ Needed by: RequestTokenEndpoint
+        """
+        return []
+
