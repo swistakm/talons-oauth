@@ -204,11 +204,10 @@ class ExampleRequestValidator(RequestValidator):
     def verify_request_token(self, token, request):
         """ Needed by: AuthorizationEndpoint
         """
-        all_tokens = [token['token'] for token in REQUEST_TOKENS.values()]
+        all_tokens = [value['token'] for value in REQUEST_TOKENS.values()]
         return token in all_tokens
 
     def get_default_realms(self, client_key, request):
         """ Needed by: RequestTokenEndpoint
         """
         return []
-

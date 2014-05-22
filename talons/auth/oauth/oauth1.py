@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-\
-
 import logging
 
 from oauthlib.oauth1.rfc5849 import signature
@@ -8,6 +7,7 @@ from talons import exc
 from talons.auth import interfaces
 
 LOG = logging.getLogger(__name__)
+
 
 class Identifier(interfaces.Identifies):
     def identify(self, request):
@@ -30,10 +30,12 @@ class Identifier(interfaces.Identifies):
     def _is_oauth(request):
         check = signature.collect_parameters
         return any((
-            check(headers=request.headers, exclude_oauth_signature=False,
-                  with_realm=True),
-            check(body=request.stream, exclude_oauth_signature=False),
-            check(uri_query=request.query_string, exclude_oauth_signature=False)
+            check(headers=request.headers,
+                  exclude_oauth_signature=False, with_realm=True),
+            check(body=request.stream,
+                  exclude_oauth_signature=False),
+            check(uri_query=request.query_string,
+                  exclude_oauth_signature=False)
         ))
 
 

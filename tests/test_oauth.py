@@ -19,8 +19,6 @@ class TestOAuth(testtools.TestCase):
     def setUp(self):
         self.useFixture(fixtures.FakeLogger(level=logging.DEBUG,
                                             format=LOG_FORMAT))
-
-        access_token = validator.ACCESS_TOKENS[validator.CLIENT_KEYS[0]]
         super(TestOAuth, self).setUp()
 
     def get_oauth_client(self, client_key):
@@ -52,10 +50,11 @@ class TestOAuth(testtools.TestCase):
         req = mock.MagicMock(spec=falcon.Request)
 
         type(req).stream = stream = mock.PropertyMock(return_value=None)
-        type(req).method = method = mock.PropertyMock(return_value="GET")
         type(req).headers = headers = mock.PropertyMock(return_value=dict())
         type(req).query_string = query = mock.PropertyMock(return_value="")
-        type(req).url = url = mock.PropertyMock(return_value='resource_url/')
+
+        type(req).method = mock.PropertyMock(return_value="GET")
+        type(req).url = mock.PropertyMock(return_value='resource_url/')
 
         type(req).env = env = mock.PropertyMock(return_value=dict())
 
@@ -83,14 +82,15 @@ class TestOAuth(testtools.TestCase):
         type(req).stream = stream = mock.PropertyMock(return_value=None)
         type(req).method = method = mock.PropertyMock(return_value=method)
         type(req).headers = headers = mock.PropertyMock(return_value=headers)
-        type(req).query_string = query = mock.PropertyMock(return_value="")
+
+        type(req).query_string = mock.PropertyMock(return_value="")
         type(req).url = url = mock.PropertyMock(return_value=url)
 
         # clean env to ensure that won't stop checking for identity
         type(req).env = mock.PropertyMock(return_value=dict())
 
         mod_cls = 'talons.auth.oauth.oauth1.OAuthIdentity'
-        with mock.patch(mod_cls, spec=OAuthIdentity) as i_mock:
+        with mock.patch(mod_cls, spec=OAuthIdentity):
             i = Identifier()
             i.identify(req)
 
