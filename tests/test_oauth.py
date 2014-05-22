@@ -1,17 +1,16 @@
 # -*- coding: utf-8 -*-
 import logging
+
+import falcon
 import fixtures
 import mock
-import falcon
-
 import oauthlib
 from oauthlib.oauth1 import SIGNATURE_TYPE_AUTH_HEADER
 import testtools
+from talons.auth.oauth.oauth1 import Authenticator, OAuthIdentity, Identifier
 
-from talons.auth import oauth
-
-from . import validator
 from .validator import ExampleRequestValidator
+from . import validator
 
 LOG_FORMAT = "[%(levelname)-7s] %(msg)s"
 
@@ -44,7 +43,7 @@ class TestOAuth(testtools.TestCase):
         req.env.get = mock.MagicMock()
         req.env.get.side_effect = ['something']
 
-        i = oauth.Identifier()
+        i = Identifier()
         i.identify(req)
 
         req.env.get.assert_called_once_with('wsgi.identity')
@@ -60,9 +59,9 @@ class TestOAuth(testtools.TestCase):
 
         type(req).env = env = mock.PropertyMock(return_value=dict())
 
-        mod_cls = 'talons.auth.oauth.OAuthIdentity'
-        with mock.patch(mod_cls, spec=oauth.OAuthIdentity) as i_mock:
-            i = oauth.Identifier()
+        mod_cls = 'talons.auth.oauth.oauth1.OAuthIdentity'
+        with mock.patch(mod_cls, spec=OAuthIdentity) as i_mock:
+            i = Identifier()
             i.identify(req)
 
             # this three must me used to check if it could be OAuth
@@ -90,16 +89,16 @@ class TestOAuth(testtools.TestCase):
         # clean env to ensure that won't stop checking for identity
         type(req).env = mock.PropertyMock(return_value=dict())
 
-        mod_cls = 'talons.auth.oauth.OAuthIdentity'
-        with mock.patch(mod_cls, spec=oauth.OAuthIdentity) as i_mock:
-            i = oauth.Identifier()
+        mod_cls = 'talons.auth.oauth.oauth1.OAuthIdentity'
+        with mock.patch(mod_cls, spec=OAuthIdentity) as i_mock:
+            i = Identifier()
             i.identify(req)
 
             assert stream.called
             assert method.called
             assert headers.called
             assert url.called
-            assert req.env[oauth.Identifier.IDENTITY_ENV_KEY]
+            assert req.env[Identifier.IDENTITY_ENV_KEY]
 
     def test_authenticator_invalid(self):
         """ Test authentication fail when request does not identify
@@ -109,10 +108,10 @@ class TestOAuth(testtools.TestCase):
         headers = {}
         url = "resource"
 
-        identity = oauth.OAuthIdentity(
+        identity = OAuthIdentity(
             url, method=method, headers=headers, stream=stream)
 
-        authenticator = oauth.Authenticator(
+        authenticator = Authenticator(
             oauth_validator=ExampleRequestValidator())
         assert not authenticator.authenticate(identity)
 
@@ -126,11 +125,11 @@ class TestOAuth(testtools.TestCase):
             self.get_oauth_client(validator.CLIENT_KEYS[0]).sign(
                 'https://example.com/resource', method)
 
-        identity = oauth.OAuthIdentity(
+        identity = OAuthIdentity(
             url, method=method, headers=headers, stream=body
         )
 
-        authenticator = oauth.Authenticator(
+        authenticator = Authenticator(
             oauth_validator=ExampleRequestValidator(),
             realms=['photos', 'printers'])
         assert authenticator.authenticate(identity)
@@ -145,11 +144,11 @@ class TestOAuth(testtools.TestCase):
             self.get_oauth_client(validator.CLIENT_KEYS[1]).sign(
                 'https://example.com/resource', method)
 
-        identity = oauth.OAuthIdentity(
+        identity = OAuthIdentity(
             url, method=method, headers=headers, stream=body,
         )
 
-        authenticator = oauth.Authenticator(
+        authenticator = Authenticator(
             oauth_validator=ExampleRequestValidator(),
             realms=['photos', 'printers'],
         )
@@ -166,11 +165,11 @@ class TestOAuth(testtools.TestCase):
             self.get_oauth_client(validator.CLIENT_KEYS[2]).sign(
                 'https://example.com/resource', method)
 
-        identity = oauth.OAuthIdentity(
+        identity = OAuthIdentity(
             url, method=method, headers=headers, stream=body,
         )
 
-        authenticator = oauth.Authenticator(
+        authenticator = Authenticator(
             oauth_validator=ExampleRequestValidator(),
             realms=['photos', 'printers'],
         )
@@ -186,11 +185,11 @@ class TestOAuth(testtools.TestCase):
             self.get_oauth_client(validator.CLIENT_KEYS[0]).sign(
                 'https://example.com/resource', method)
 
-        identity = oauth.OAuthIdentity(
+        identity = OAuthIdentity(
             url, method=method, headers=headers, stream=body
         )
 
-        authenticator = oauth.Authenticator(
+        authenticator = Authenticator(
             oauth_validator=ExampleRequestValidator(),
             realms=[])
         assert authenticator.authenticate(identity)
