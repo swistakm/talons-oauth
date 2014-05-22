@@ -112,7 +112,7 @@ class TestOAuth(testtools.TestCase):
             url, method=method, headers=headers, stream=stream)
 
         authenticator = Authenticator(
-            oauth_validator=ExampleRequestValidator())
+            oauth1_validator=ExampleRequestValidator())
         assert not authenticator.authenticate(identity)
 
     def test_authenticator_valid_realms_match(self):
@@ -130,8 +130,8 @@ class TestOAuth(testtools.TestCase):
         )
 
         authenticator = Authenticator(
-            oauth_validator=ExampleRequestValidator(),
-            realms=['photos', 'printers'])
+            oauth1_validator=ExampleRequestValidator(),
+            oauth1_realms=['photos', 'printers'])
         assert authenticator.authenticate(identity)
 
     def test_authenticator_invalid_realm(self):
@@ -149,8 +149,8 @@ class TestOAuth(testtools.TestCase):
         )
 
         authenticator = Authenticator(
-            oauth_validator=ExampleRequestValidator(),
-            realms=['photos', 'printers'],
+            oauth1_validator=ExampleRequestValidator(),
+            oauth1_realms=['photos', 'printers'],
         )
         assert not authenticator.authenticate(identity)
 
@@ -170,8 +170,8 @@ class TestOAuth(testtools.TestCase):
         )
 
         authenticator = Authenticator(
-            oauth_validator=ExampleRequestValidator(),
-            realms=['photos', 'printers'],
+            oauth1_validator=ExampleRequestValidator(),
+            oauth1_realms=['photos', 'printers'],
         )
         assert not authenticator.authenticate(identity)
 
@@ -190,6 +190,6 @@ class TestOAuth(testtools.TestCase):
         )
 
         authenticator = Authenticator(
-            oauth_validator=ExampleRequestValidator(),
-            realms=[])
+            oauth1_validator=ExampleRequestValidator(),
+            oauth1_realms=[])
         assert authenticator.authenticate(identity)

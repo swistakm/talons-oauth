@@ -51,7 +51,7 @@ class Authenticator(interfaces.Authenticates):
         :raises `talons.exc.BadConfiguration` if configuration options
             are not valid or conflict with each other.
         """
-        oauth_validator = conf.pop('oauth_validator', None)
+        oauth_validator = conf.pop('oauth1_validator', None)
         if not oauth_validator:
             msg = ("Missing required oauth_validator "
                    "configuration option.")
@@ -59,7 +59,7 @@ class Authenticator(interfaces.Authenticates):
             raise exc.BadConfiguration(msg)
 
         self.provider = ResourceEndpoint(oauth_validator)
-        self.realms = conf.pop('realms', [])
+        self.realms = conf.pop('oauth1_realms', [])
 
     def authenticate(self, identity):
         """ Authenticate user client using oauthlib's ResourceEndopoint
