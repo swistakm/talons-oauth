@@ -38,6 +38,7 @@ setup(
     author_email='swistakm@gmail.com',
     description='OAuth 1.0 extension for Talons WSGI middleware library',
     long_description=README,
+    url="https://github.com/swistakm/talons-oauth",
 
     packages=PACKAGES,
 

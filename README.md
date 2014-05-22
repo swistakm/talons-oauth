@@ -4,7 +4,11 @@
 
 `talons-oauth` provides OAuth 1.0 extension for
 [Talons WSGI middleware library](https://github.com/talons/talons)
-in `talons.auth` namespace.
+in `talons.auth` namespace. You can install it with pip:
+
+```
+pip install talons-oauth
+```
 
 
 ## Usage example
@@ -36,10 +40,12 @@ identificates "user" by whole set of request body, method, headers and url
 parameters. This data will be needed then for verifing request signature.
 
 `oauth1.Identifier.identify()` returns `True` only if request looks like
-OAuth 1.0 request - has either valid auth header, body parameters or query
-string (according to [RFC-5849](http://tools.ietf.org/html/rfc5849)).
-Identity set in request is a `talons.auth.interfaces.Identity` subclass with
-all its base attributes set to `None/default`.
+OAuth 1.0. request - has either valid auth header, body parameters or query
+string (as specified in [RFC 5849](http://tools.ietf.org/html/rfc5849)).
+Identity stored in request is a `talons.auth.oauth.oauth1.OAuthIdentity`
+instance that subclasses `talons.auth.interfaces.Identity`. All its base
+attributes (`login`, `key`, `roles`, `groups`) are set to `None' or default
+value. This should not break other talons authenticators.
 
 ## `talons.auth.oauth.oauth1.Authenticator`
 
@@ -73,7 +79,7 @@ Full list of configuration parameters:
 
 ## Providing OAuth 1.0. endpoints
 
-Providing endpoints for accessing/authorizing request and access tokens is
-beyond thew scope of this library. Once you create your `RequestValidator`
+Providing endpoints for accessing/authorizing request tokens and access tokens
+is beyond the scope of this library. Once you create your `RequestValidator`
 subclass it should be easy to use
 [generic oauthlib endpoints](https://oauthlib.readthedocs.org/en/latest/oauth1/server.html#create-your-endpoint-views).
